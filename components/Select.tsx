@@ -1,5 +1,5 @@
-import { useState } from "react";
-import Image from 'next/image'
+import Image from "next/image";
+import { KeyboardEvent } from "react";
 import styled from "styled-components";
 
 type Props = {
@@ -8,37 +8,34 @@ type Props = {
     value: number | string;
   }[];
   placeholder?: string;
+  selectedOptionLabel: string;
+  getSelectProps: () => {
+    isOpen: boolean;
+    onKeyDown: (e: KeyboardEvent<HTMLButtonElement>) => void;
+    onClick: () => void;
+  };
+  getOptionsProps: () => { isOpen: boolean };
+  getOptionProps: (index: number) => {
+    isSelected: boolean;
+    isHover: boolean;
+    onClick: () => void;
+    onMouseEnter: () => void;
+  };
 };
 
 export default function CustomSelect(props: Props) {
-const [isActive, setIsActive] = useState(false);
-const [selectedItemIndex, setSelectedItemIndex] = useState<number | null>(null);
-
   const {
     options,
-    onChange,
-    onFocus,
-    onBlur,
-    defaultValue,
-    placeholder,
-    autofocus,
-    defaultOpen,
-    open,
-    disabled,
-    optionsRender,
-    notFoundContent,
-    showArrow,
-    size,
+    selectedOptionLabel,
+    getSelectProps,
+    getOptionsProps,
+    getOptionProps,
   } = props;
 
   return (
     <Container>
-      <Select onClick={() => setIsActive(prevState => !prevState)} isActive={isActive}>
-        <span>
-          {selectedItemIndex !== null
-            ? options?.[selectedItemIndex]?.label
-            : "Select an option"}
-        </span>
+      <Select {...getSelectProps()}>
+        <span>{selectedOptionLabel}</span>
         <Image
           className="arrow-icon"
           src="/icons/arrow.svg"
@@ -47,14 +44,9 @@ const [selectedItemIndex, setSelectedItemIndex] = useState<number | null>(null);
           alt="arrow"
         />
       </Select>
-      <Options isActive={isActive}>
+      <Options {...getOptionsProps()}>
         {options.map(({ label, value }, index) => (
-          <Option
-            key={value}
-            value={value}
-            onClick={() => setSelectedItemIndex(index)}
-            selected={index === selectedItemIndex}
-          >
+          <Option key={value} {...getOptionProps(index)}>
             <span>{label}</span>
             <Image
               className="check-icon"
@@ -72,9 +64,10 @@ const [selectedItemIndex, setSelectedItemIndex] = useState<number | null>(null);
 
 const Container = styled.div`
   width: 100%;
+  position: relative;
 `;
 
-const Select = styled.button<{ isActive: boolean}>`
+const Select = styled.button<{ isOpen: boolean }>`
   color: dimgray;
   border-radius: 10px;
   width: 200px;
@@ -90,8 +83,12 @@ const Select = styled.button<{ isActive: boolean}>`
   outline: 0;
 
   .arrow-icon {
-    transform: ${({isActive}) => isActive ? 'rotate(180deg)' : 'rotate(0deg)'};
-    transition: all .2s;
+    transform: ${({ isOpen }) => (isOpen ? "rotate(180deg)" : "rotate(0deg)")};
+    transition: all 0.2s;
+  }
+
+  &:hover {
+    background-color: #f1faff;
   }
 
   &:focus {
@@ -99,9 +96,9 @@ const Select = styled.button<{ isActive: boolean}>`
   }
 `;
 
-const Options = styled.ul<{ isActive: boolean }>`
+const Options = styled.ul<{ isOpen: boolean }>`
   background-color: white;
-  display: ${({isActive}) => isActive ? 'flex' : 'none'};
+  display: ${({ isOpen }) => (isOpen ? "flex" : "none")};
   flex-direction: column;
   gap: 8px;
   border: 1px solid silver;
@@ -109,26 +106,31 @@ const Options = styled.ul<{ isActive: boolean }>`
   margin-top: 5px;
   padding: 8px;
   list-style: none;
+  position: absolute;
+  left: 0;
+  right: 0;
 `;
 
-const Option = styled.li<{ selected?: boolean }>`
+const Option = styled.li<{ isSelected?: boolean; isHover?: boolean }>`
   display: flex;
   justify-content: space-between;
   font-size: 18px;
   color: dimgray;
   border-radius: 8px;
   padding: 6px 12px;
-  background-color: ${({ selected }) =>
-    selected ? "rgba(65, 105, 225, 0.1)" : "transparent"};
+  background-color: ${({ isSelected, isHover }) =>
+    isSelected
+      ? "rgba(65, 105, 225, 0.1)"
+      : isHover
+      ? "lightgray"
+      : "transparent"};
+  color: ${({ isSelected }) => (isSelected ? "royalblue" : "")};
 
   &:hover {
-    background-color: lightgray;
-    color: royalblue;
     cursor: pointer;
   }
 
   .check-icon {
-    display: ${({selected}) => selected ? 'block' : 'none'};
+    display: ${({ isSelected }) => (isSelected ? "block" : "none")};
   }
 `;
-
