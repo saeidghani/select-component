@@ -1,5 +1,6 @@
+import useClickOutside from "@/hooks/useClickOutside";
 import Image from "next/image";
-import { KeyboardEvent } from "react";
+import { KeyboardEvent, useRef } from "react";
 import styled from "styled-components";
 
 type Props = {
@@ -21,6 +22,7 @@ type Props = {
     onClick: () => void;
     onMouseEnter: () => void;
   };
+  setIsOpen: (bool: boolean) => void
 };
 
 export default function CustomSelect(props: Props) {
@@ -30,7 +32,11 @@ export default function CustomSelect(props: Props) {
     getSelectProps,
     getOptionsProps,
     getOptionProps,
+    setIsOpen,
   } = props;
+
+  const ref = useRef<HTMLUListElement>(null);
+  useClickOutside(ref, () => setIsOpen(false));
 
   return (
     <Container>
@@ -44,7 +50,7 @@ export default function CustomSelect(props: Props) {
           alt="arrow"
         />
       </Select>
-      <Options {...getOptionsProps()}>
+      <Options {...getOptionsProps()} ref={ref}>
         {options.map(({ label, value }, index) => (
           <Option key={value} {...getOptionProps(index)}>
             <span>{label}</span>

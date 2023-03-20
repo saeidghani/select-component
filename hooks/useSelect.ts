@@ -12,8 +12,8 @@ type Props = {
     value: Value;
   }[];
   placeholder?: string;
-  onChange?: (e: KeyboardEvent<HTMLButtonElement>) => void;
   defaultValue?: Value
+  onChange?: (e: KeyboardEvent<HTMLButtonElement>) => void;
 };
 
 export default function useSelect({
@@ -107,6 +107,7 @@ export default function useSelect({
       getSelectProps,
       getOptionsProps,
       getOptionProps,
+      setIsOpen,
     },
   };
 }
