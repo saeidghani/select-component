@@ -35,11 +35,11 @@ export default function CustomSelect(props: Props) {
     setIsOpen,
   } = props;
 
-  const ref = useRef<HTMLUListElement>(null);
+  const ref = useRef<HTMLDivElement>(null);
   useClickOutside(ref, () => setIsOpen(false));
 
   return (
-    <Container>
+    <Container ref={ref}>
       <Select {...getSelectProps()}>
         <span>{selectedOptionLabel}</span>
         <Image
@@ -50,7 +50,7 @@ export default function CustomSelect(props: Props) {
           alt="arrow"
         />
       </Select>
-      <Options {...getOptionsProps()} ref={ref}>
+      <Options {...getOptionsProps()}>
         {options.map(({ label, value }, index) => (
           <Option key={value} {...getOptionProps(index)}>
             <span>{label}</span>
