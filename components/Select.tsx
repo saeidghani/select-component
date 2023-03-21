@@ -74,13 +74,13 @@ const Container = styled.div`
 `;
 
 const Select = styled.button<{ isOpen: boolean }>`
-  color: dimgray;
+  color: ${({ theme }) => theme.colors.grayDark};
   border-radius: 10px;
   width: 200px;
   padding: 10px;
   background-color: white;
   font-size: 18px;
-  border: 1px solid silver;
+  border: ${({ theme }) => `1px solid ${theme.colors.gray}`};
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -94,11 +94,11 @@ const Select = styled.button<{ isOpen: boolean }>`
   }
 
   &:hover {
-    background-color: #f1faff;
+    background-color: ${({ theme }) => theme.colors.grayLight};
   }
 
   &:focus {
-    border: 1px solid royalblue;
+    border: ${({ theme }) => `1px solid ${theme.colors.primary}`};
   }
 `;
 
@@ -107,7 +107,7 @@ const Options = styled.ul<{ isOpen: boolean }>`
   display: ${({ isOpen }) => (isOpen ? "flex" : "none")};
   flex-direction: column;
   gap: 8px;
-  border: 1px solid silver;
+  border: ${({ theme }) => `1px solid ${theme.colors.gray}`};
   border-radius: 12px;
   margin-top: 5px;
   padding: 8px;
@@ -115,22 +115,23 @@ const Options = styled.ul<{ isOpen: boolean }>`
   position: absolute;
   left: 0;
   right: 0;
+  z-index: 10;
 `;
 
 const Option = styled.li<{ isSelected?: boolean; isHover?: boolean }>`
   display: flex;
   justify-content: space-between;
   font-size: 18px;
-  color: dimgray;
+  color: ${({ theme }) => theme.colors.grayDark};
   border-radius: 8px;
   padding: 6px 12px;
-  background-color: ${({ isSelected, isHover }) =>
+  background-color: ${({ isSelected, isHover, theme }) =>
     isSelected
-      ? "rgba(65, 105, 225, 0.1)"
+      ? theme.colors.primaryLight
       : isHover
-      ? "lightgray"
+      ? theme.colors.grayLight
       : "transparent"};
-  color: ${({ isSelected }) => (isSelected ? "royalblue" : "")};
+  color: ${({ isSelected, theme }) => (isSelected ? theme.colors.primary : "")};
 
   &:hover {
     cursor: pointer;
