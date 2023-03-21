@@ -22,7 +22,7 @@ type Props = {
     onClick: () => void;
     onMouseEnter: () => void;
   };
-  setIsOpen: (bool: boolean) => void
+  setIsOpen: (bool: boolean) => void;
 };
 
 export default function CustomSelect(props: Props) {

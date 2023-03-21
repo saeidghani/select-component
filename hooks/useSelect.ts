@@ -1,7 +1,7 @@
-import { KeyboardEvent, useCallback, useEffect, useState } from "react";
+import { KeyboardEvent, useCallback, useEffect, useRef, useState } from "react";
 
 type KeysMap = {
-  [k in "ArrowUp" | "ArrowDown" | "Enter"]: () => void;
+  [k in "ArrowUp" | "ArrowDown" | "Enter" | "Tab" | "Escape"]: () => void;
 };
 
 type Value = number | string;
@@ -31,6 +31,8 @@ export default function useSelect({
   const [hoverOptionIndex, setHoverOptionIndex] = useState<number>(0);
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
+  const selectRef = useRef<HTMLButtonElement>(null);
+
   useEffect(() => {
     if (!isOpen) {
       setHoverOptionIndex(selectedOptionIndex || 0);
@@ -46,6 +48,11 @@ export default function useSelect({
       }
       const { key } = e;
 
+      const closeOptions = () => {
+           setIsOpen(false);
+           selectRef?.current?.blur?.();
+      }
+
       const keysMap: KeysMap = {
         ArrowUp: () => setHoverOptionIndex((prev) => Math.max(0, prev - 1)),
         ArrowDown: () =>
@@ -55,6 +62,8 @@ export default function useSelect({
           setIsOpen(false);
           onChange?.(e)
         },
+        Tab: closeOptions,
+        Escape: closeOptions        
       };
 
       if (key in keysMap) keysMap[key as keyof KeysMap]();
@@ -67,14 +76,17 @@ export default function useSelect({
       isOpen,
       onKeyDown,
       onClick: () => setIsOpen((prevState) => !prevState),
+      ref: selectRef
     }),
     [isOpen, onKeyDown]
   );
 
-  const getOptionsProps = () => ({ 
+  const getOptionsProps = useCallback(() => ({ 
     isOpen,
-    'aria-hidden': !isOpen
- });
+    role: 'listbox',
+    'aria-hidden': !isOpen,
+    'aria-labelledby': 'select-label',
+ }), [isOpen]);
 
   const getOptionProps = useCallback(
     (index: number) => ({
@@ -85,7 +97,9 @@ export default function useSelect({
         setIsOpen(false);
       },
       onMouseEnter: () => setHoverOptionIndex(index),
-      'aria-selected': index === selectedOptionIndex
+      "aria-selected": index === selectedOptionIndex,
+      id: "select-label",
+      role: "option",
     }),
     [hoverOptionIndex, selectedOptionIndex]
   );
